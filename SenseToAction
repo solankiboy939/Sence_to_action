@@ -1,0 +1,55 @@
+import speech_recognition as sr
+from gtts import gTTS
+import os
+import gradio as gr
+
+def voice_to_text(audio_file):
+    recognizer = sr.Recognizer()
+    with sr.AudioFile(audio_file) as source:
+        audio = recognizer.record(source)
+        try:
+            text = recognizer.recognize_google(audio)
+            return text
+        except sr.UnknownValueError:
+            return "Sorry, I did not understand your audio."
+        except sr.RequestError:
+            return "Could not request result from Google Speech Recognition service."
+
+def text_to_voice(text):
+    if text:
+        tts = gTTS(text=text, lang='en')
+        file_path = "output.mp3"
+        tts.save(file_path)
+        return file_path
+    return None
+
+def main(choice, audio_file, text):
+    if choice == "Convert Voice to Text":
+        if audio_file:
+            return voice_to_text(audio_file)
+    elif choice == "Convert Text to Voice":
+        if text:
+            audio_file_path = text_to_voice(text)
+            return audio_file_path
+    return "No valid input provided."
+
+def create_interface():
+    with gr.Blocks() as demo:
+        gr.Markdown("# Speech Recognition and Text-to-Speech App")
+
+        choice = gr.Radio(label="Choose an option:", choices=["Convert Voice to Text", "Convert Text to Voice"], value="Convert Voice to Text")
+        
+        audio_input = gr.Audio(label="Upload an audio file (WAV/MP3)", type="filepath")
+        text_input = gr.Textbox(label="Enter the text to convert to voice:")
+        
+        output = gr.Audio(label="Output Audio")
+
+        button = gr.Button("Submit")
+        
+        button.click(main, inputs=[choice, audio_input, text_input], outputs=[output])
+
+    return demo
+
+if __name__ == "__main__":
+    demo = create_interface()
+    demo.launch()

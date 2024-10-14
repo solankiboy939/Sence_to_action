@@ -2,7 +2,6 @@ import streamlit as st
 import speech_recognition as sr
 from gtts import gTTS
 import os
-import pygame
 
 def voice_to_text(audio_file):
     recognizer = sr.Recognizer()
@@ -28,6 +27,7 @@ def text_to_voice(text):
 def main():
     st.title("Voice Recognition App")
 
+    st.subheader("Convert Voice to Text")
     audio_file = st.file_uploader("Upload an audio file", type=["wav", "mp3"])
     if audio_file:
         st.audio(audio_file, format='audio/wav')  # Preview audio
